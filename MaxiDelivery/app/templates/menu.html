@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<body>
+      <h1>Ресторан {{restaurant}}</h1>
+      <p>Работает по адресу: {{adres}}</p>
+      <p>По району: {{district}}</p>
+      <h2>Меню ресторана</h2>
+      {% for m in menu_lst %}
+      <p><a href="{{ url_for('about_dish', dish = m, restaurant=restaurant) }}"><span style="color: black;">{{ m }}</span></a></p>
+      {% endfor %}
+</body>
+{% endblock %}

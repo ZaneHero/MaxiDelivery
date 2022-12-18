@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<body>
+      <h1>Состав {{dish}}</h1>
+      {% for i in ingridients %}
+      <p>{{i}}</p>
+      {% endfor %}
+      <form action="" method="post"  novalidate>
+        {{ form.hidden_tag() }}
+        <p>{{ form.count() }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</body>
+{% endblock %}

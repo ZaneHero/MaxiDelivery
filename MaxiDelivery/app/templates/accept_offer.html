@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<body>
+      <p>Вы действительно хотите взять заказ № {{offer_id}} на доставку?</p>
+      <form action="" method="post"  novalidate>
+        {{ form.hidden_tag() }}
+        <p>{{ form.submit() }}</p>
+    </form>
+</body>
+{% endblock %}

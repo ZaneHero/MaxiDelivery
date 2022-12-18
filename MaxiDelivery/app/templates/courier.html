@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ user.name }}</h1>
+    <hr>
+    <p>Район доставки - {{zone}}</p>
+    <h5><a href="{{ url_for('index') }}">Сменить район работы</a></h5>
+
+    <h2><a href="{{ url_for('my_delivers', username = current_user.username) }}">Я доставляю</a></h2>
+
+    <h2>Взять доставку на выполнение:</h2>
+    {% for n in notdelivery_offers %}
+    <hr>
+      <p>Что нужно доставить: {{n[0]}}</p>
+      <p>Куда нужно доставить: {{n[1]}}</p>
+      <p>Номер заказа: {{n[2]}}</p>
+      <a href="{{ url_for('accept_offer', offer_id=n[2]) }}">Взять на доставку</a>
+    {% endfor %}
+    <h2><a href="{{ url_for('offers_history', username = current_user.username) }}">История доставок</a></h2>
+    
+{% endblock %}

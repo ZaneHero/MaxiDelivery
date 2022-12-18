@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Нужно доставить эти заказы:</h2>
+    {% for o in offers %}
+    <hr>
+      <p>Что нужно доставить: {{o[0]}}</p>
+      <p>Куда нужно доставить: {{o[1]}}</p>
+      <p>Номер заказа: {{o[2]}}</p>
+      <a href = "{{url_for('endoffer', offer_id = o[2])}}">Заказ доставлен</a>
+    {% endfor %}
+    <h2><a href="{{ url_for('courier', username = current_user.username) }}">Назад</a></h2>
+    
+{% endblock %}

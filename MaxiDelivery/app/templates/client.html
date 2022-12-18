@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ user.name }}</h1>
+    <hr>
+    <p>Ваш текущий район для доставки - {{district}}</p>
+    <p>Ваш текущий адрес доставки - {{ user.adress }}</p>
+    <h5><a href="{{ url_for('index') }}">Сменить адрес доставки</a></h5>
+    
+
+    <h2>Моя корзина</h2>
+    {% for c in cart %}
+    <hr>
+      <p>Блюдо: {{c[0]}}</p>
+      <p>Стоимость за единицу: {{c[1]}}</p>
+      <p>В корзине: {{c[2]}}</p>
+    {% endfor %}
+    <p>Итого в корзине на {{cart_summ}} рублей</p>
+    <form action="" method="post"  novalidate>
+        {{ form.hidden_tag() }}
+        <p>{{ form.submit() }}</p>
+    </form>
+    <h2><a href="{{ url_for('offers', username = current_user.username) }}">Мне доставляют</a></h2>
+
+    <h2><a href="{{ url_for('delivered_offers', username = current_user.username) }}">История заказов</a></h2>
+    
+{% endblock %}
