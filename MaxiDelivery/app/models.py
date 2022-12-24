@@ -270,6 +270,14 @@ class Restaurant():
         result = list(map(lambda x: str(x[0]) , result))
         result = result[0]
         return result
+        
+        
+    def get_id_by_name(name):
+        query = f'''SELECT ID FROM RESTAURANT WHERE REST_NAME='{name}';'''
+        result = Database.select_query(query)
+        result = list(map(lambda x: str(x[0]) , result))
+        result = result[0]
+        return result
 
 class Menu():
 
@@ -319,8 +327,8 @@ class Cart():
         return result
 
 class Position():
-    def add(cart_id, dish_id, count):
-        query = f'''INSERT INTO POSITION(CART_ID, DISH_ID, COUNT) VALUES ('{cart_id}', '{dish_id}', '{count}');'''
+    def add(cart_id, dish_id, count, rest_id):
+        query = f'''INSERT INTO POSITION(CART_ID, DISH_ID, COUNT, RESTAURANT_ID) VALUES ('{cart_id}', '{dish_id}', '{count}', '{rest_id}');'''
         return Database.execute_query(query)
 
     def get_cart_by_user(username):
@@ -345,6 +353,30 @@ class Position():
         return result
 
 class Offer():
+    def get_courier_by_id(id):
+        query = f'''SELECT COURIER.FIO FROM
+                    COURIER JOIN OFFER
+                    ON OFFER.COURIER_PHONE_NUMBER=COURIER.PHONE_NUMBER
+                    WHERE OFFER.ID='{id}';'''
+        result = Database.select_query(query)
+        return result
+
+    def get_information_by_id(id):
+        query = f'''SELECT RESTAURANT.REST_NAME, to_char(OFFER.DAYDATE, 'dd-MM-YYYY'), CLIENT.ADRESS
+                    FROM OFFER JOIN CLIENT ON OFFER.CLIENT_USERNAME=CLIENT.USERNAME
+                    JOIN POSITION ON OFFER.ID=POSITION.OFFER_ID
+                    JOIN RESTAURANT ON POSITION.RESTAURANT_ID=RESTAURANT.ID
+                    WHERE OFFER.ID='{id}';'''
+        result = Database.select_query(query)
+        return result
+
+    def get_positions_by_id(id):
+        query = f'''SELECT MENU.DISH, POSITION.COUNT, MENU.COST
+                    FROM MENU JOIN POSITION ON POSITION.DISH_ID=MENU.ID
+                    WHERE POSITION.OFFER_ID='{id}';'''
+        result = Database.select_query(query)
+        return result
+
     def add(cl_id, cl_username, day_date):
         query = f'''INSERT INTO OFFER(CLIENT_ID, CLIENT_USERNAME, DAYDATE)
                 VALUES ('{cl_id}', '{cl_username}', '{day_date}') RETURNING ID;'''
@@ -358,9 +390,9 @@ class Offer():
         return Database.execute_query(query)
 
     def get_by_user(username):
-        query = f'''SELECT MENU.DISH, MENU.COST, POSITION.COUNT
-                    FROM MENU JOIN POSITION ON POSITION.DISH_ID=MENU.ID
-                    JOIN CART ON POSITION.CART_ID=CART.ID
+        query = f'''SELECT DISTINCT POSITION.OFFER_ID, RESTAURANT.REST_NAME
+                    FROM POSITION JOIN CART ON POSITION.CART_ID=CART.ID
+                    JOIN RESTAURANT ON POSITION.RESTAURANT_ID=RESTAURANT.ID
                     JOIN CLIENT ON CART.CLIENT_USERNAME=CLIENT.USERNAME
                     JOIN OFFER ON OFFER.ID=POSITION.OFFER_ID
                     WHERE POSITION.OFFER_ID IS NOT NULL AND CLIENT.USERNAME='{username}' AND DELIVERED=false;'''
@@ -372,9 +404,9 @@ class Offer():
 
 
     def get_delivered_by_username(username):
-        query = f'''SELECT MENU.DISH, MENU.COST, POSITION.COUNT, OFFER.DAYDATE
-                    FROM MENU JOIN POSITION ON POSITION.DISH_ID=MENU.ID
-                    JOIN CART ON POSITION.CART_ID=CART.ID
+        query = f'''SELECT DISTINCT POSITION.OFFER_ID, RESTAURANT.REST_NAME, OFFER.DAYDATE
+                    FROM POSITION JOIN CART ON POSITION.CART_ID=CART.ID
+                    JOIN RESTAURANT ON POSITION.RESTAURANT_ID=RESTAURANT.ID
                     JOIN CLIENT ON CART.CLIENT_USERNAME=CLIENT.USERNAME
                     JOIN OFFER ON OFFER.ID=POSITION.OFFER_ID
                     WHERE POSITION.OFFER_ID IS NOT NULL AND CLIENT.USERNAME='{username}' AND DELIVERED=true;'''
@@ -385,12 +417,10 @@ class Offer():
         return result
 
     def get_notdelivery():
-        query = f'''SELECT MENU.DISH, CLIENT.ADRESS, OFFER.ID
-                    FROM MENU JOIN POSITION ON POSITION.DISH_ID=MENU.ID
-                    JOIN CART ON POSITION.CART_ID=CART_ID
-                    JOIN CLIENT ON CART.CLIENT_USERNAME=CLIENT.USERNAME
-                    JOIN OFFER ON OFFER.ID=POSITION.OFFER_ID
-                    WHERE POSITION.OFFER_ID IS NOT NULL AND OFFER.DELIVERY=false;'''
+        query = f'''SELECT OFFER.ID, REST_NAME FROM OFFER JOIN POSITION
+                    ON POSITION.OFFER_ID=OFFER.ID
+                    JOIN RESTAURANT ON POSITION.RESTAURANT_ID=RESTAURANT.ID
+                    WHERE DELIVERY=false;'''
         result = Database.select_query(query)
         return result
 
@@ -401,9 +431,9 @@ class Offer():
         return Database.execute_query(query)
 
     def get_offers_delivers_by_this_courier(cour_username):
-        query = f'''SELECT MENU.DISH, CLIENT.ADRESS, OFFER.ID
-                    FROM MENU JOIN POSITION ON POSITION.DISH_ID=MENU.ID
-                    JOIN CART ON POSITION.CART_ID=CART_ID
+        query = f'''SELECT DISTINCT POSITION.OFFER_ID, RESTAURANT.REST_NAME
+                    FROM POSITION JOIN CART ON POSITION.CART_ID=CART_ID
+                    JOIN RESTAURANT ON POSITION.RESTAURANT_ID=RESTAURANT.ID
                     JOIN CLIENT ON CART.CLIENT_USERNAME=CLIENT.USERNAME
                     JOIN OFFER ON OFFER.ID=POSITION.OFFER_ID
                     WHERE OFFER.COURIER_PHONE_NUMBER='{cour_username}' AND DELIVERED=false;'''
@@ -417,8 +447,9 @@ class Offer():
         return Database.execute_query(query)
 
     def get_delivered_offers_by_courier(username):
-        query = f'''SELECT MENU.DISH, MENU.COST, POSITION.COUNT, OFFER.DAYDATE, OFFER.ID
-                    FROM MENU JOIN POSITION ON POSITION.DISH_ID=MENU.ID
+        query = f'''SELECT DISTINCT POSITION.OFFER_ID, RESTAURANT.REST_NAME
+                    FROM POSITION JOIN CART ON POSITION.CART_ID=CART_ID
+                    JOIN RESTAURANT ON POSITION.RESTAURANT_ID=RESTAURANT.ID
                     JOIN OFFER ON OFFER.ID=POSITION.OFFER_ID
                     WHERE OFFER.COURIER_PHONE_NUMBER='{username}' AND DELIVERED=true;'''
         result = Database.select_query(query)

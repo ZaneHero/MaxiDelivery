@@ -11,10 +11,10 @@
     <h2>Взять доставку на выполнение:</h2>
     {% for n in notdelivery_offers %}
     <hr>
-      <p>Что нужно доставить: {{n[0]}}</p>
-      <p>Куда нужно доставить: {{n[1]}}</p>
-      <p>Номер заказа: {{n[2]}}</p>
-      <a href="{{ url_for('accept_offer', offer_id=n[2]) }}">Взять на доставку</a>
+      <p>Номер заказа: <a href="{{ url_for('offer_information', offer=n[0]) }}">{{n[0]}}</a></p>
+      
+      <p>Ресторан: {{n[1]}}</p>
+      <a href="{{ url_for('accept_offer', offer_id=n[0]) }}">Взять на доставку</a>
     {% endfor %}
     <h2><a href="{{ url_for('offers_history', username = current_user.username) }}">История доставок</a></h2>
     

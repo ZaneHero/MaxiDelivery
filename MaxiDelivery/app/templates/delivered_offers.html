@@ -5,10 +5,9 @@
       <h2>История заказов</h2>
       {% for o in offers %}
       <hr>
-        <p>Блюдо: {{o[0]}}</p>
-        <p>Стоимость за единицу: {{o[1]}}</p>
-        <p>Количество: {{o[2]}}</p>
-        <p>Дата: {{o[3]}}</p>
+        <p>Номер заказа: <a href="{{ url_for('offer_information', offer=o[0]) }}">{{o[0]}}</a></p>
+        <p>Ресторан: {{o[1]}}</p>
+        <p>Дата заказа: {{o[2]}}</p>
       {% endfor %}
       <a href="{{ url_for('client', username=username) }}">Назад</a>
 </body>

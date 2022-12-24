@@ -29,8 +29,9 @@ def about_dish(restaurant, dish):
     if form.validate_on_submit():
         cart_id = Cart.get_by_username(current_user.username)
         dish_id = Menu.get_id_by_name(dish)
+        restaurant_id = Restaurant.get_id_by_name(restaurant)
         count = form.count.data
-        Position.add(cart_id, dish_id, count)
+        Position.add(cart_id, dish_id, count, restaurant_id)
         return redirect(url_for('restaurant_menu', restaurant=restaurant))
         
     return render_template('about_dish.html', title = 'О блюде', ingridients=ingridients, form=form, dish=dish)
@@ -63,7 +64,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = "/index"
         return redirect(next_page)
-    return render_template('login.html', title = 'Личный кабинет пациента', form=form)
+    return render_template('login.html', title = 'Личный кабинет', form=form)
 
 # регистрация клиента
 @app.route("/registration", methods = ['GET', 'POST'])
@@ -160,11 +161,32 @@ def endoffer(offer_id):
 @login_required
 def offers_history(username):
     delivers = Offer.get_delivered_offers_by_courier(username)
-    return render_template('offers_history.html', title='История доставок', delivers=delivers)
+    return render_template('offers_history.html', title='История доставок', delivers=delivers, username=username)
+
+@app.route("/offer_information/<offer>", methods = ['GET', 'POST'])
+@login_required
+def offer_information(offer):
+    information = Offer.get_information_by_id(offer)
+    rest = information[0][0]
+    day = str(information[0][1])
+    courier = Offer.get_courier_by_id(offer)
+    if len(courier)==0:
+        courier = 'Заказ еще не передан курьеру'
+    else:
+        courier = courier[0][0]
+    adres = information[0][2]
+    print('---------------------------------------------------')
+    print(f'{rest} {day} {adres}')
+    positions = Offer.get_positions_by_id(offer)
+    summ = 0
+    for p in positions:
+        summ += p[1]*p[2]
+    return render_template('offer_information.html', title = 'Информация по заказу', positions = positions, summ = summ, rest=rest, day=day, adres=adres, courier=courier)
 
 # выйти из аккаунта
 @app.route("/logout")
 @login_required
 def logout():
+
     logout_user()
     return redirect("/index")

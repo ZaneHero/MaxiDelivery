@@ -5,12 +5,10 @@
       <h2>История доставок</h2>
       {% for d in delivers %}
       <hr>
-        <p>Блюдо: {{d[0]}}</p>
-        <p>Стоимость за единицу: {{d[1]}}</p>
-        <p>Количество: {{d[2]}}</p>
-        <p>Дата: {{d[3]}}</p>
-        <p>Номер заказа: {{d[4]}}</p>
+        <p>Номер заказа: <a href="{{ url_for('offer_information', offer=d[0]) }}">{{d[0]}}</a></p>
+        
+        <p>Из какого ресторана был заказ: {{d[1]}}</p>
       {% endfor %}
-      <a href="{{ url_for('client', username=username) }}">Назад</a>
+      <a href="{{ url_for('courier', username=username) }}">Назад</a>
 </body>
 {% endblock %}
